@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import useEnv from './useConfig';
 
 /**
  * This function takes a list of objects and a key and returns a copy of the list with no duplicate keys.
@@ -22,10 +23,11 @@ const filterUniqueId = (list, key) => {
  * loading: true if currently fetching new page
  */
 const useApi = () => {
+  // Get API key from config
+  const {API_KEY} = useEnv();
   // Set uri bases
   const posterUriBase = 'https://image.tmdb.org/t/p/w500';
-  const movieApiBase =
-    'http://api.themoviedb.org/3/discover/movie?api_key=API_KEY&page=';
+  const movieApiBase = `http://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&page=`;
   // Save current movies list
   const [movies, setMovies] = useState([]);
   // Save the current page to be loaded from the api
@@ -102,7 +104,7 @@ const useApi = () => {
     fetch(`${movieApiBase}${currentPage}`)
       .then(res => res.json().then(handleResults).catch(handleJsonError))
       .catch(handleFetchError);
-  }, [currentPage]);
+  }, [currentPage, movieApiBase]);
 
   return [movies, loadMore, currentPage === totalPages, loading];
 };
